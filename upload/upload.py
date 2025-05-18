@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 from collections import defaultdict
-from utils.cfg import cfg
+from config.setting import cfg
 from scripts.dataframe import load_df
 from scripts.classify import classify_main
 from scripts.upload_utils import get_file_path, do_git_commit, send_notification

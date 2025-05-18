@@ -2,7 +2,91 @@ import os, json, subprocess, shutil, getpass
 from pathlib import Path
 import yaml
 from dotenv import load_dotenv
+import os
+import subprocess
+import sys
+from pathlib import Path
+import platform
 
+def get_pycg_script_path() -> Path:
+    base = Path.home()
+    if platform.system() == "Windows":
+        return base / "AppData/Roaming/Python/Python313/Scripts"
+    else:
+        return base / ".local/bin"  # Linux, macOS default pip user install
+
+def add_path_to_bashrc(p: Path):
+    shell = os.environ.get("SHELL", "")
+    rc_file = Path.home() / (".zshrc" if "zsh" in shell else ".bashrc")
+
+    export_line = f'export PATH="{str(p)}:$PATH"'
+    if rc_file.exists():
+        content = rc_file.read_text()
+        if export_line in content:
+            print("✅ PATH 이미 등록되어 있음")
+            return
+    with open(rc_file, "a") as f:
+        f.write(f"\n# [Auto] Added by check_err.py for pycg\n{export_line}\n")
+    print(f"✅ {rc_file.name}에 PATH 등록 완료 (다음 셸 세션부터 반영됨)")
+
+def check_pycg_and_register():
+    try:
+        subprocess.run(["pycg", "--help"], capture_output=True, text=True, check=True)
+        print("✅ pycg CLI 실행 확인 완료")
+    except FileNotFoundError:
+        print("❌ pycg 명령어를 찾을 수 없습니다")
+        pycg_path = get_pycg_script_path()
+        if platform.system() == "Windows":
+            os.environ["PATH"] += os.pathsep + str(pycg_path)
+            print(f"📌 PATH에 임시로 {pycg_path} 추가했습니다 (현재 세션)")
+        else:
+            add_path_to_bashrc(pycg_path)
+
+if __name__ == "__main__":
+    check_pycg_and_register()
+from pathlib import Path
+import os
+import subprocess
+
+def get_gitbash_path_line() -> str:
+    """
+    Windows + Git Bash에서 pycg 경로를 bashrc에 export하는 라인 생성
+    """
+    user_path = Path.home() / "AppData" / "Roaming" / "Python" / "Python313" / "Scripts"
+    # Git Bash는 /c/Users/chan1/... 형식으로 표기
+    bash_path = str(user_path).replace("\\", "/").replace("C:", "/c")
+    return f'export PATH="{bash_path}:$PATH"'
+
+
+def ensure_pycg_path_in_bashrc():
+    bashrc = Path.home() / ".bashrc"
+    export_line = get_gitbash_path_line()
+
+    if bashrc.exists():
+        content = bashrc.read_text()
+        if export_line in content:
+            print("✅ ~/.bashrc에 이미 pycg PATH가 등록되어 있습니다.")
+            return
+
+    with open(bashrc, "a", encoding="utf-8") as f:
+        f.write(f"\n# [Auto] Added for pycg CLI access\n{export_line}\n")
+    print("✅ ~/.bashrc에 pycg 경로를 등록했습니다.")
+    print("🚀 `source ~/.bashrc`를 실행하거나 터미널을 재시작하면 적용됩니다.")
+
+
+def test_pycg_cli():
+    try:
+        subprocess.run(["pycg", "--help"], capture_output=True, text=True, check=True)
+        print("✅ pycg CLI 정상 실행 확인")
+        return True
+    except FileNotFoundError:
+        print("❌ pycg 실행 실패: CLI 경로가 등록되어 있지 않습니다")
+        return False
+
+
+if __name__ == "__main__":
+    if not test_pycg_cli():
+        ensure_pycg_path_in_bashrc()
 # ─────────────────────────────────────
 def print_status(label, value, status="ok"):
     symbols = {"ok": "✅", "warn": "⚠️", "fail": "❌"}

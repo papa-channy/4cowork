@@ -5,7 +5,7 @@ import requests
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
-from utils.cfg import log  # 로그 저장 함수 불러오기
+from config.setting import log  # 로그 저장 함수 불러오기
 # 🔹 환경변수 로드
 load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 

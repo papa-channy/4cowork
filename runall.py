@@ -1,6 +1,6 @@
 # runall.py (중복 load_df 제거 최종 완성본)
 import sys
-from utils.cfg import cfg
+from config.setting import cfg
 from scripts.dataframe import load_df
 from scripts.ext_info import extract_all_info
 from scripts.mm_gen import mm_gen_main

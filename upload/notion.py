@@ -7,7 +7,7 @@ from pathlib import Path
 
 # 내부 로깅 시스템이 있다면 연동
 try:
-    from utils.cfg import cfg
+    from config.setting import cfg
 except ImportError:
     cfg = None
 

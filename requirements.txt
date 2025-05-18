@@ -1,0 +1,5 @@
+networkx
+pandas
+python-louvain
+symhash
+libcst
