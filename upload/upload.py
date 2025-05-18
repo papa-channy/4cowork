@@ -1,6 +1,5 @@
 from pathlib import Path
 import json
-from collections import defaultdict
 from config.setting import cfg
 from scripts.dataframe import load_df
 from scripts.classify import classify_main

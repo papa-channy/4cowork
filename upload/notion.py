@@ -41,12 +41,6 @@ def get_repo_name() -> str:
     except Exception:
         return "Unknown Repo"
 
-def get_notion_blocks(parent_id: str) -> list:
-    url = f"{NOTION_URL_BASE}/blocks/{parent_id}/children?page_size=100"
-    resp = requests.get(url, headers=HEADERS)
-    resp.raise_for_status()
-    return resp.json().get("results", [])
-
 def find_or_create_toggle_block(parent_id: str, title_text: str) -> str:
     try:
         children = get_notion_blocks(parent_id)

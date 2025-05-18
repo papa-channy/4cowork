@@ -42,12 +42,6 @@ def send_notification(platforms: list[str], msg: str, log_func: Callable) -> lis
     """
     from notify import discord, gmail, kakao, slack
 
-    platform_map = {
-        "kakao": kakao.send,
-        "gmail": gmail.send,
-        "slack": slack.send,
-        "discord": discord.send
-    }
 
     failed = []
 

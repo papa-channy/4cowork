@@ -49,17 +49,6 @@ class RunAllPipeline:
         except Exception as e:
             cfg.log(f"❌ 파일 전략 분류 실패: {e}", self.log_file)
 
-    def run_explain(self):
-        if self.strategy_df is None or self.strategy_df[self.strategy_df["Importance"] > 3].empty:
-            cfg.log("⚠️ 설명 생성 대상 없음 → 생략", self.log_file)
-            return
-        try:
-            cfg.log("📝 4단계: 기능 설명 생성 시작", self.log_file)
-            fx_elab_main()
-            cfg.log("✅ 기능 설명 완료", self.log_file)
-        except Exception as e:
-            cfg.log(f"❌ 기능 설명 실패: {e}", self.log_file)
-
     def run_commit_msg(self):
         if self.strategy_df is None or self.strategy_df[self.strategy_df["Importance"] > 3].empty:
             cfg.log("⚠️ 커밋 메시지 대상 없음 → 생략", self.log_file)

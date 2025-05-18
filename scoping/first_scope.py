@@ -11,26 +11,36 @@ def get_changed_files() -> list[str]:
     - 숨김 디렉토리 및 캐시/가상환경 관련 폴더 제거
     - 실제로 존재하지 않는 파일은 제거
     """
+    USER_CONFIG_PATH = Path("config/user_config.yml")
     with USER_CONFIG_PATH.open(encoding="utf-8") as f:
         user_cfg = yaml.safe_load(f)
     allowed_exts = set(user_cfg.get("change detection", {}).get("provider", []))
 
-    result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
-    lines = result.stdout.strip().splitlines()
+    result = subprocess.run(["git", "status", "--porcelain=v2"], capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"❌ git status 실행 실패: {result.stderr}")
+        return []
 
+    lines = result.stdout.strip().splitlines()
     changed = []
+
     for line in lines:
-        if not line.strip():
+        if not line.startswith("1 "):  # 일반 tracked 파일 항목
             continue
-        status, path = line[:2].strip(), line[3:].strip()
-        if status not in {"M", "A", "??"}:
+
+        parts = line.strip().split(" ")
+        xy_status = parts[1]  # 예: "M.", "A.", ".M", 등
+        path = parts[-1]      # 경로는 항상 마지막
+
+        # 🎯 상태 검사: 수정(M), 추가(A), 신규(??)만 포함
+        if "M" not in xy_status and "A" not in xy_status:
             continue
+
         if not any(path.endswith(ext) for ext in allowed_exts):
             continue
 
         p = Path(path)
         parts = p.parts
-
         if any(part.startswith(".") for part in parts):
             continue
         if any(part in {
@@ -38,12 +48,34 @@ def get_changed_files() -> list[str]:
             ".pytest_cache", "build", "dist", "venv"
         } for part in parts):
             continue
-        if not p.exists():  # 🔥 존재하지 않는 파일 제거
-            continue
+
+        if not p.exists():
+            continue  # 삭제된 파일은 제외
 
         changed.append(str(p))
-    return changed
 
+    return changed
+from pathlib import Path
+
+def get_all_py_files_in_repo(root: Path = Path(".")) -> list[str]:
+    """
+    레포 전체에서 유효한 .py 파일 경로를 재귀적으로 탐색
+    - 숨김 폴더 제외
+    - __pycache__, venv 등 제외
+    - .py 확장자만
+    """
+    ignored_dirs = {
+        ".git", "__pycache__", "venv", ".mypy_cache", ".pytest_cache",
+        "build", "dist", ".ipynb_checkpoints"
+    }
+    py_files = []
+
+    for p in root.rglob("*.py"):
+        if any(part in ignored_dirs or part.startswith(".") for part in p.parts):
+            continue
+        py_files.append(str(p))
+
+    return py_files
 
 def basic_filter(files: list[str]) -> list[str]:
     """
@@ -62,6 +94,10 @@ def git_tool_filter(files: list[str]) -> tuple[list[str], dict[str, float]]:
     - 최근 7일 커밋 여부 +0.1
     - 메인 브랜치 작업 여부 +0.1
     """
+    if len(files) <= 3:
+        # ✅ 조건 분기: 3개 이하면 점수 상관없이 전부 포함
+        score_map = {f: 1.0 for f in files}
+        return files, score_map
     score_map = defaultdict(float)
     total_diff_lines = 0
     file_diff_lines = {}
@@ -125,9 +161,9 @@ def git_tool_filter(files: list[str]) -> tuple[list[str], dict[str, float]]:
         score = 0.0
         counts = struct_counts.get(f, {})
         over_count = sum([
-            counts.get("def", 0) > def_median,
-            counts.get("class", 0) > class_median,
-            counts.get("from", 0) > from_median
+            counts.get("def", 0) >= def_median,
+            counts.get("class", 0) >= class_median,
+            counts.get("from", 0) >= from_median
         ])
         if over_count == 3:
             score += 1.0
@@ -147,7 +183,7 @@ def git_tool_filter(files: list[str]) -> tuple[list[str], dict[str, float]]:
 
         score = round(score, 4)
         score_map[f] = score
-        if score >= 0.4:
+        if score >= 0.7:
             selected.append(f)
 
     return selected, dict(score_map)
