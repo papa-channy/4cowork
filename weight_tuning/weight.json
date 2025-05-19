@@ -1,0 +1,47 @@
+{
+   "Gradio": 
+    {   
+        "weight":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        "Gradio": 0,
+        "Pydantic-core": 0,
+        "Haystack": 0,
+        "FastAPI Users": 0,
+        "Bandit": 0
+    },
+    "Pydantic-core":
+    {   
+        "weight":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        "Gradio": 0,
+        "Pydantic-core": 0,
+        "Haystack": 0,
+        "FastAPI Users": 0,
+        "Bandit": 0
+    },
+    "Haystack":
+    {   
+        "weight":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        "Gradio": 0,
+        "Pydantic-core": 0,
+        "Haystack": 0,
+        "FastAPI Users": 0,
+        "Bandit": 0
+    },
+    "FastAPI Users":
+    {   
+        "weight":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        "Gradio": 0,
+        "Pydantic-core": 0,
+        "Haystack": 0,
+        "FastAPI Users": 0,
+        "Bandit": 0
+    },
+    "Bandit":
+    {   
+        "weight":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        "Gradio": 0,
+        "Pydantic-core": 0,
+        "Haystack": 0,
+        "FastAPI Users": 0,
+        "Bandit": 0
+    }
+}
