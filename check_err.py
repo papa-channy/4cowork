@@ -8,26 +8,7 @@ import sys
 from pathlib import Path
 import platform
 
-def get_pycg_script_path() -> Path:
-    base = Path.home()
-    if platform.system() == "Windows":
-        return base / "AppData/Roaming/Python/Python313/Scripts"
-    else:
-        return base / ".local/bin"  # Linux, macOS default pip user install
 
-def add_path_to_bashrc(p: Path):
-    shell = os.environ.get("SHELL", "")
-    rc_file = Path.home() / (".zshrc" if "zsh" in shell else ".bashrc")
-
-    export_line = f'export PATH="{str(p)}:$PATH"'
-    if rc_file.exists():
-        content = rc_file.read_text()
-        if export_line in content:
-            print("✅ PATH 이미 등록되어 있음")
-            return
-    with open(rc_file, "a") as f:
-        f.write(f"\n# [Auto] Added by check_err.py for pycg\n{export_line}\n")
-    print(f"✅ {rc_file.name}에 PATH 등록 완료 (다음 셸 세션부터 반영됨)")
 
 def check_pycg_and_register():
     try:
